@@ -1,0 +1,100 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\NotificationLogResource\Pages;
+use App\Filament\Resources\NotificationLogResource\RelationManagers;
+use App\Models\NotificationLog;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class NotificationLogResource extends Resource
+{
+    protected static ?string $model = NotificationLog::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Select::make('user_id')
+                ->relationship('user', 'name')
+                ->label('User'),
+                // ->disabled(), // read-only
+                 Forms\Components\Select::make('notification_type_id')
+                ->relationship('notificationType', 'name')
+                ->label('Notification Type'),
+                // ->disabled()
+                 Forms\Components\Select::make('channel')
+                ->options([
+                    'email' => 'Email',
+                    'sms' => 'SMS',
+                    'in_app' => 'In App',
+                ]),
+                // ->disabled()
+                Forms\Components\Select::make('status')
+                ->options([
+                    'sent' => 'Sent',
+                    'failed' => 'Failed',
+                ]),
+                // ->disabled()
+                Forms\Components\DateTimePicker::make('sent_at')
+                ->label('Sent At'),
+                // ->disabled()
+                Forms\Components\Textarea::make('response_message')
+                ->label('Response Message')
+                ->rows(4),
+                // ->disabled()
+                
+            ])->columns(2);
+            
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('user.name')->label('User'),
+                Tables\Columns\TextColumn::make('notificationType.name')->label('Type'),
+                Tables\Columns\TextColumn::make('channel'),
+                Tables\Columns\TextColumn::make('status')->badge()->colors([
+                           'sent' => 'success',
+                           'failed' => 'danger',
+]),             
+                 Tables\Columns\TextColumn::make('sent_at')->dateTime(),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListNotificationLogs::route('/'),
+            'create' => Pages\CreateNotificationLog::route('/create'),
+            'edit' => Pages\EditNotificationLog::route('/{record}/edit'),
+        ];
+    }
+}
