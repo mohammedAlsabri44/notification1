@@ -22,23 +22,35 @@ class NotificationTemplateResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-               Forms\Components\Select::make('notification_type_id')
-            ->relationship('notificationType', 'name')
-            ->required(),
-               Forms\Components\Select::make('channel')
-            ->options([
-                  'email' => 'Email',
-                  'sms' => 'SMS',
-                  'in_app' => 'In App',
-    ])
-            ->required(),
-            Forms\Components\TextInput::make('subject')->nullable(),
-            Forms\Components\Textarea::make('body')->required(),
-            //    Forms\Components\TextInput::make('subject')->visible(fn ($get) => $get('channel') === 'email'),
-               
-            ]);
-    }
+        ->schema([
+            Forms\Components\Select::make('notification_type_id')
+                ->relationship('notificationType', 'name')
+                ->required()
+                ->label('Notification Type'),
+
+            Forms\Components\Select::make('channel')
+                ->options([
+                    'email' => 'Email',
+                    'sms' => 'SMS',
+                    'in_app' => 'In App',
+                ])
+                ->required()
+                ->reactive() // ضروري لتحديث القيم بناءً على الاختيار
+
+                ->label('Channel'),
+
+            // يظهر فقط إذا كانت القناة Email
+            Forms\Components\TextInput::make('subject')
+                ->label('Subject')
+                ->nullable()
+                ->visible(fn ($get) => $get('channel') === 'email'),
+
+            Forms\Components\Textarea::make('body')
+                ->label('Body')
+                ->required()
+                ->rows(4),
+        ]);
+}
 
     public static function table(Table $table): Table
     {

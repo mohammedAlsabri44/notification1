@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\SelectFilter;
 
 
 class Notification_TypesResource extends Resource
@@ -29,6 +30,7 @@ class Notification_TypesResource extends Resource
                 Forms\Components\Toggle::make('is_active'),
 
             ]);
+
     }
 
     public static function table(Table $table): Table
@@ -40,9 +42,14 @@ class Notification_TypesResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
 
             ])
-            ->filters([
-                //
-            ])
+             ->filters([
+            SelectFilter::make('is_active')
+                ->label('Status')
+                ->options([
+                    1 => 'Active',
+                    0 => 'Inactive',
+                ]),
+        ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])

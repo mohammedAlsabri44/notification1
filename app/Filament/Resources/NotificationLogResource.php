@@ -12,6 +12,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter; 
+use Filament\Forms\Components\DatePicker; 
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 
 class NotificationLogResource extends Resource
 {
@@ -69,8 +74,37 @@ class NotificationLogResource extends Resource
 ]),             
                  Tables\Columns\TextColumn::make('sent_at')->dateTime(),
             ])
+           
+             ->headerActions([
+            ExportAction::make()->label('تصدير كـ CSV'),
+
+             ])
+
             ->filters([
-                //
+                SelectFilter::make('status')
+                ->label('Status')
+                ->options([
+                    'sent' => 'Sent',
+                    'failed' => 'Failed',
+                ]),
+                TernaryFilter::make('response_message')
+                ->label('Has Response?')
+                ->trueLabel('Has Response')
+                ->falseLabel('No Response')
+                ->queries(
+                    true: fn ($query) => $query->whereNotNull('response_message')->where('response_message', '!=', ''),
+                    false: fn ($query) => $query->whereNull('response_message')->orWhere('response_message', ''),
+                ),
+                 Filter::make('sent_at')
+                ->form([
+                    DatePicker::make('from')->label('From'),
+                    DatePicker::make('until')->label('To'),
+                ])
+                ->query(function ($query, array $data) {
+                    return $query
+                        ->when($data['from'], fn ($q) => $q->whereDate('sent_at', '>=', $data['from']))
+                        ->when($data['until'], fn ($q) => $q->whereDate('sent_at', '<=', $data['until']));
+                }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

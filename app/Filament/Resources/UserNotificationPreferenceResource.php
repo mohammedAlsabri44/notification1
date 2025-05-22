@@ -38,7 +38,22 @@ class UserNotificationPreferenceResource extends Resource
     ])
                     ->required(),
 
-                Forms\Components\Toggle::make('is_enabled'),
+                Forms\Components\Toggle::make('is_enabled')
+    ->label('Enabled')
+    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+        $channel = $get('channel');
+
+        $isChannelEnabled = \App\Models\NotificationChannel::where('name', $channel)->value('is_enabled');
+
+        if ($state && !$isChannelEnabled) {
+            $set('is_enabled', false); // Reset toggle
+            throw \Filament\Notifications\Notification::make()
+                ->title('This channel is currently disabled.')
+                ->danger()
+                ->send();
+        }
+    }),
+
 
             ]);
     }

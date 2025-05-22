@@ -32,10 +32,26 @@ class AdminBroadcastResource extends Resource
                      'in_app' => 'In App',
     ])
             ->required(),
-                Forms\Components\TextInput::make('filter_by_role')->nullable(), // إذا أردت تحديد دور
-                Forms\Components\DateTimePicker::make('scheduled_at')->nullable(),
-                Forms\Components\Toggle::make('sent'),
-            ]);
+                Forms\Components\TextInput::make('filter_by_role')
+            ->label('Filter by Role (optional)')
+            ->placeholder('admin, user, etc.')
+            ->helperText('Leave empty to broadcast to all users.'),
+
+        Forms\Components\Toggle::make('schedule')
+            ->label('Schedule for later?')
+            ->default(false)
+            ->reactive(),
+
+       Forms\Components\DateTimePicker::make('scheduled_at')
+            ->label('Scheduled At')
+            ->visible(fn ($get) => $get('schedule') === true)
+            ->required(fn ($get) => $get('schedule') === true)
+            ->after(now()),
+
+        Forms\Components\Toggle::make('sent')
+            ->label('Mark as Sent') // يُستخدم عادة للعرض فقط وليس للإدخال
+            ->disabled(),
+    ]);
     }
 
     public static function table(Table $table): Table
@@ -56,6 +72,7 @@ class AdminBroadcastResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

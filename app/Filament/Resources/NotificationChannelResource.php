@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\SelectFilter;
 
 class NotificationChannelResource extends Resource
 {
@@ -40,7 +41,12 @@ class NotificationChannelResource extends Resource
 
             ])
             ->filters([
-                //
+                SelectFilter::make('is_enabled')
+                ->label('Status')
+                ->options([
+                    true => 'Enabled',
+                    false => 'Disabled',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
