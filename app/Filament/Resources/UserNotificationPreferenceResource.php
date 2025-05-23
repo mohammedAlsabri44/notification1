@@ -38,7 +38,7 @@ class UserNotificationPreferenceResource extends Resource
     ])
                     ->required(),
 
-                Forms\Components\Toggle::make('is_enabled')
+               Forms\Components\Toggle::make('is_enabled')
     ->label('Enabled')
     ->afterStateUpdated(function ($state, callable $set, callable $get) {
         $channel = $get('channel');
@@ -46,13 +46,17 @@ class UserNotificationPreferenceResource extends Resource
         $isChannelEnabled = \App\Models\NotificationChannel::where('name', $channel)->value('is_enabled');
 
         if ($state && !$isChannelEnabled) {
-            $set('is_enabled', false); // Reset toggle
-            throw \Filament\Notifications\Notification::make()
-                ->title('This channel is currently disabled.')
-                ->danger()
-                ->send();
+            $set('is_enabled', false); // إلغاء التفعيل تلقائيًا
+
+            \Filament\Notifications\Notification::make()
+                ->title('هذا القناة معطّلة حاليًا')
+                ->body('لا يمكنك تفعيل الإشعار لأن القناة المختارة غير مفعّلة.')
+                ->danger()// يضيف لون أحمر وإشارة تحذير
+
+                ->send();// إرسال الإشعار
         }
-    }),
+    })
+    ->reactive(), // ضروري لتحديث الحالة بشكل فوري
 
 
             ]);

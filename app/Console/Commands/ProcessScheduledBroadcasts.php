@@ -10,10 +10,10 @@ class ProcessScheduledBroadcasts extends Command
 {
     protected $signature = 'broadcasts:process';
     protected $description = 'Send scheduled admin broadcasts';
-    protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule): void
-{
-    $schedule->command('broadcasts:process')->everyMinute();
-}
+//     protected function schedule(\Illuminate\Console\Scheduling\Schedule $schedule): void
+// {
+//     $schedule->command('broadcasts:process')->everyMinute();
+// }
 
 
     public function handle(): void

@@ -93,7 +93,9 @@ class NotificationLogResource extends Resource
                 ->falseLabel('No Response')
                 ->queries(
                     true: fn ($query) => $query->whereNotNull('response_message')->where('response_message', '!=', ''),
-                    false: fn ($query) => $query->whereNull('response_message')->orWhere('response_message', ''),
+                    false: fn ($query) => $query->where(function ($q) {
+    $q->whereNull('response_message')->orWhere('response_message', '');
+}),
                 ),
                  Filter::make('sent_at')
                 ->form([
