@@ -1,53 +1,38 @@
 <?php
 
-namespace Tests\Unit\Models;
-
-use Tests\TestCase;
 use App\Models\User;
 use App\Models\NotificationLog;
 use App\Models\Notification_Types;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class NotificationLogModelTest extends TestCase
-{
-    use RefreshDatabase;
+uses(Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    /** @test */
-    public function it_can_create_notification_log()
-    {
-        $log = NotificationLog::factory()->create();
+it('can create notification log', function () {
+    $log = NotificationLog::factory()->create();
 
-        $this->assertDatabaseHas('notification_logs', [
-            'id' => $log->id,
-            'status' => $log->status,
-        ]);
-    }
+    $this->assertDatabaseHas('notification_logs', [
+        'id' => $log->id,
+        'status' => $log->status,
+    ]);
+});
 
-    /** @test */
-    public function it_belongs_to_user()
-    {
-        $log = NotificationLog::factory()->create();
+it('belongs to user', function () {
+    $log = NotificationLog::factory()->create();
 
-        $this->assertInstanceOf(User::class, $log->user);
-    }
+    expect($log->user)->toBeInstanceOf(User::class);
+});
 
-    /** @test */
-    public function it_belongs_to_notification_type()
-    {
-        $log = NotificationLog::factory()->create();
+it('belongs to notification type', function () {
+    $log = NotificationLog::factory()->create();
 
-        $this->assertInstanceOf(Notification_Types::class, $log->notificationType);
-    }
+    expect($log->notificationType)->toBeInstanceOf(Notification_Types::class);
+});
 
-    /** @test */
-    public function it_casts_dates_correctly()
-    {
-        $log = NotificationLog::factory()->create([
-            'sent_at' => now(),
-            'created_at' => now(),
-        ]);
+it('casts dates correctly', function () {
+    $log = NotificationLog::factory()->create([
+        'sent_at' => now(),
+        'created_at' => now(),
+    ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $log->sent_at);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $log->created_at);
-    }
-}
+    expect($log->sent_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+    expect($log->created_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+});

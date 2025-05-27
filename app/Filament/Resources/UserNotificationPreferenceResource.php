@@ -61,11 +61,11 @@ class UserNotificationPreferenceResource extends Resource
 
             ]);
     }
-    public static function getEloquentQuery(): Builder
-{
-    return parent::getEloquentQuery()
-        ->where('user_id', auth()->id()); // فقط بيانات المستخدم الحالي
-}
+//     public static function getEloquentQuery(): Builder
+// {
+//     return parent::getEloquentQuery()
+//         ->where('user_id', auth()->id()); // فقط بيانات المستخدم الحالي
+// }
 
 
     public static function table(Table $table): Table
@@ -113,7 +113,7 @@ class UserNotificationPreferenceResource extends Resource
 ])
             ->actions([
     Tables\Actions\EditAction::make()
-        ->visible(fn ($record) => $record->user_id === auth()->id() || auth()->user()->hasRole('admin')),
+        ->visible(fn ($record) => $record->user_id === auth()->id() || auth()->user()),
 ])
 
             ->bulkActions([

@@ -1,70 +1,46 @@
 <?php
 
-namespace Tests\Unit;
-
 use App\Models\NotificationChannel;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
 
-class NotificationChannelTest extends TestCase
-{
-    use RefreshDatabase;
+uses(Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    #[Test]
-    public function notification_channels_table_has_expected_columns(): void
-    {
-        $this->assertTrue(Schema::hasTable('notification_channels'));
+test('notification channels table has expected columns', function () {
+    expect(Schema::hasTable('notification_channels'))->toBeTrue();
 
-        $expected = [
-            'id', 'name', 'is_enabled', 'priority_order', 'created_at', 'updated_at'
-        ];
+    $expected = [
+        'id', 'name', 'is_enabled', 'priority_order', 'created_at', 'updated_at'
+    ];
 
-        foreach ($expected as $column) {
-            $this->assertTrue(
-                Schema::hasColumn('notification_channels', $column),
-                "Missing column: $column"
-            );
-        }
+    foreach ($expected as $column) {
+        expect(Schema::hasColumn('notification_channels', $column))->toBeTrue("Missing column: $column");
     }
+});
 
-    #[Test]
-    public function it_can_create_a_notification_channel(): void
-    {
-        $channel = NotificationChannel::create([
-            'name' => 'email',
-            'is_enabled' => true,         // نمررها يدويًا لتجنب مشكلة SQLite
-            'priority_order' => 1,        // نمررها أيضًا
-        ]);
+it('can create a notification channel', function () {
+    $channel = NotificationChannel::create([
+        'name' => 'email',
+        'is_enabled' => true,
+        'priority_order' => 1,
+    ]);
 
-        $this->assertDatabaseHas('notification_channels', [
-            'name' => 'email',
-            'is_enabled' => true,
-            'priority_order' => 1,
-        ]);
+    expect(\DB::table('notification_channels')->where('name', 'email')->exists())->toBeTrue();
 
-        $this->assertTrue($channel->is_enabled);
-        $this->assertEquals(1, $channel->priority_order);
-    }
+    expect($channel->is_enabled)->toBeTrue();
+    expect($channel->priority_order)->toEqual(1);
+});
 
-    #[Test]
-    public function it_requires_unique_name(): void
-    {
-        NotificationChannel::create([
-            'name' => 'sms',
-            'is_enabled' => true,
-            'priority_order' => 0,
-        ]);
+it('requires unique name', function () {
+    NotificationChannel::create([
+        'name' => 'sms',
+        'is_enabled' => true,
+        'priority_order' => 0,
+    ]);
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
-
-        NotificationChannel::create([
-            'name' => 'sms', // محاولة تكرار الاسم
-            'is_enabled' => false,
-            'priority_order' => 2,
-        ]);
-    }
-}
-
+    NotificationChannel::create([
+        'name' => 'sms',
+        'is_enabled' => false,
+        'priority_order' => 2,
+    ]);
+})->throws(\Illuminate\Database\QueryException::class);
 

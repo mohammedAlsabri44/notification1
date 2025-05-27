@@ -1,59 +1,48 @@
 <?php
 
-namespace Tests\Unit\Models;
-
-use Tests\TestCase;
 use App\Models\NotificationChannel;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class NotificationChannelModelTest extends TestCase
-{
-    use RefreshDatabase;
+uses(Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    /** @test */
-    public function it_can_create_a_notification_channel()
-    {
-        $channel = NotificationChannel::factory()->create([
-            'name' => 'Email',
-            'is_enabled' => true,
-            'priority_order' => 1,
-        ]);
 
-        $this->assertDatabaseHas('notification_channels', [
-            'name' => 'Email',
-            'is_enabled' => true,
-            'priority_order' => 1,
-        ]);
-    }
+it('can create a notification channel', function () {
+    $channel = NotificationChannel::factory()->create([
+        'name' => 'Email',
+        'is_enabled' => true,
+        'priority_order' => 1,
+    ]);
 
-    /** @test */
-    public function it_can_scope_enabled_channels()
-    {
-        NotificationChannel::factory()->create([
-            'name' => 'Email',
-            'is_enabled' => true,
-            'priority_order' => 2,
-        ]);
+    $this->assertDatabaseHas('notification_channels', [
+        'name' => 'Email',
+        'is_enabled' => true,
+        'priority_order' => 1,
+    ]);
+});
 
-        NotificationChannel::factory()->create([
-            'name' => 'SMS',
-            'is_enabled' => false,
-        ]);
+it('can scope enabled channels', function () {
+    NotificationChannel::factory()->create([
+        'name' => 'Email',
+        'is_enabled' => true,
+        'priority_order' => 2,
+    ]);
 
-        $enabled = NotificationChannel::enabled()->get();
+    NotificationChannel::factory()->create([
+        'name' => 'SMS',
+        'is_enabled' => false,
+    ]);
 
-        $this->assertCount(1, $enabled);
-        $this->assertEquals('Email', $enabled->first()->name);
-    }
+    $enabled = NotificationChannel::enabled()->get();
 
-    /** @test */
-    public function it_orders_enabled_channels_by_priority()
-    {
-        NotificationChannel::factory()->create(['name' => 'One', 'is_enabled' => true, 'priority_order' => 5]);
-        NotificationChannel::factory()->create(['name' => 'Two', 'is_enabled' => true, 'priority_order' => 1]);
+    expect($enabled)->toHaveCount(1);
+    expect($enabled->first()->name)->toEqual('Email');
+});
 
-        $channels = NotificationChannel::enabled()->get();
+it('orders enabled channels by priority', function () {
+    NotificationChannel::factory()->create(['name' => 'One', 'is_enabled' => true, 'priority_order' => 5]);
+    NotificationChannel::factory()->create(['name' => 'Two', 'is_enabled' => true, 'priority_order' => 1]);
 
-        $this->assertEquals('Two', $channels->first()->name); // lower priority_order comes first
-    }
-}
+    $channels = NotificationChannel::enabled()->get();
+
+    expect($channels->first()->name)->toEqual('Two');
+    // lower priority_order comes first
+});

@@ -79,6 +79,12 @@ class NotificationTemplateResource extends Resource
                 ->limit(50)
                 ->toggleable()
                 ->wrap(),
+                Tables\Columns\TextColumn::make('created_at')
+                // ->label('تاريخ الإنشاء')
+                ->dateTime('d-m-Y H:i'),
+            Tables\Columns\TextColumn::make('updated_at')
+                // ->label('آخر تعديل')
+                ->since(),
             ])
             ->filters([
                 //

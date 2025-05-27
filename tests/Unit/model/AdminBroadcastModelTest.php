@@ -1,49 +1,37 @@
 <?php
 
-namespace Tests\Unit\Models;
-
 use App\Models\AdminBroadcast;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Tests\TestCase;
 
-class AdminBroadcastModelTest extends TestCase
-{
-    use RefreshDatabase;
+uses(Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    /** @test */
-    public function it_can_create_admin_broadcast_with_factory()
-    {
-        $broadcast = AdminBroadcast::factory()->create([
-            'sent' => false,
-        ]);
 
-        $this->assertDatabaseHas('admin_broadcasts', [
-            'id' => $broadcast->id,
-            'sent' => false,
-        ]);
-    }
+it('can create admin broadcast with factory', function () {
+    $broadcast = AdminBroadcast::factory()->create([
+        'sent' => false,
+    ]);
 
-    /** @test */
-    public function it_casts_scheduled_at_to_datetime()
-    {
-        $broadcast = AdminBroadcast::factory()->create([
-            'scheduled_at' => '2025-12-31 12:00:00',
-        ]);
+    $this->assertDatabaseHas('admin_broadcasts', [
+        'id' => $broadcast->id,
+        'sent' => false,
+    ]);
+});
 
-        $this->assertInstanceOf(Carbon::class, $broadcast->scheduled_at);
-        $this->assertEquals('2025-12-31 12:00:00', $broadcast->scheduled_at->format('Y-m-d H:i:s'));
-    }
+it('casts scheduled at to datetime', function () {
+    $broadcast = AdminBroadcast::factory()->create([
+        'scheduled_at' => '2025-12-31 12:00:00',
+    ]);
 
-    /** @test */
-    public function it_can_attach_users()
-    {
-        $broadcast = AdminBroadcast::factory()->create();
-        $user = User::factory()->create();
+    expect($broadcast->scheduled_at)->toBeInstanceOf(Carbon::class);
+    expect($broadcast->scheduled_at->format('Y-m-d H:i:s'))->toEqual('2025-12-31 12:00:00');
+});
 
-        $broadcast->users()->attach($user);
+it('can attach users', function () {
+    $broadcast = AdminBroadcast::factory()->create();
+    $user = User::factory()->create();
 
-        $this->assertTrue($broadcast->users->contains($user));
-    }
-}
+    $broadcast->users()->attach($user);
+
+    expect($broadcast->users->contains($user))->toBeTrue();
+});

@@ -40,6 +40,12 @@ class Notification_TypesResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('slug'),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
+                Tables\Columns\TextColumn::make('created_at')
+                // ->label('تاريخ الإنشاء')
+                ->dateTime('d-m-Y H:i'),
+            Tables\Columns\TextColumn::make('updated_at')
+                // ->label('آخر تعديل')
+                ->since(),
 
             ])
              ->filters([

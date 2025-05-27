@@ -38,6 +38,12 @@ class NotificationChannelResource extends Resource
                Tables\Columns\TextColumn::make('name'),
                Tables\Columns\IconColumn::make('is_enabled')->boolean(),
                Tables\Columns\TextColumn::make('priority_order'),
+               Tables\Columns\TextColumn::make('created_at')
+                // ->label('تاريخ الإنشاء')
+                ->dateTime('d-m-Y H:i'),
+            Tables\Columns\TextColumn::make('updated_at')
+                // ->label('آخر تعديل')
+                ->since(),
 
             ])
             ->filters([
